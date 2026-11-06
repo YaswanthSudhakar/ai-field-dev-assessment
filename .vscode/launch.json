@@ -1,0 +1,201 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Task 1: demo client (starts MCP server)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/task1_mcp_server/demo_client.py",
+      "cwd": "${workspaceFolder}/task1_mcp_server",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Task 1: MCP server only (stdio)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/task1_mcp_server/server.py",
+      "cwd": "${workspaceFolder}/task1_mcp_server",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Task 2: mock MCP server :9000",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "mock_mcp_server:app",
+        "--port",
+        "9000"
+      ],
+      "cwd": "${workspaceFolder}/task2_mcp_gateway",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Task 2: gateway :8080",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "gateway:app",
+        "--port",
+        "8080"
+      ],
+      "cwd": "${workspaceFolder}/task2_mcp_gateway",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "DOWNSTREAM_URL": "http://127.0.0.1:9000/mcp"
+      }
+    },
+    {
+      "name": "Task 2: demo client",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/task2_mcp_gateway/demo_client.py",
+      "cwd": "${workspaceFolder}/task2_mcp_gateway",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Task 3: mock LLM :9100",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "mock_llm:app",
+        "--port",
+        "9100"
+      ],
+      "cwd": "${workspaceFolder}/task3_pii_stream_guardrail",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Task 3: gateway :8100",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "gateway:app",
+        "--port",
+        "8100"
+      ],
+      "cwd": "${workspaceFolder}/task3_pii_stream_guardrail",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "UPSTREAM_BASE_URL": "http://127.0.0.1:9100"
+      }
+    },
+    {
+      "name": "Task 3: demo client",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/task3_pii_stream_guardrail/demo_client.py",
+      "cwd": "${workspaceFolder}/task3_pii_stream_guardrail",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Task 4: primary provider :9201 (slow)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "mock_provider:app",
+        "--port",
+        "9201"
+      ],
+      "cwd": "${workspaceFolder}/task4_rate_limit_fallback_router",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PROVIDER_NAME": "primary",
+        "MODE": "slow",
+        "SLOW_S": "6"
+      }
+    },
+    {
+      "name": "Task 4: secondary provider :9202",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "mock_provider:app",
+        "--port",
+        "9202"
+      ],
+      "cwd": "${workspaceFolder}/task4_rate_limit_fallback_router",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PROVIDER_NAME": "secondary",
+        "MODE": "ok"
+      }
+    },
+    {
+      "name": "Task 4: gateway :8200",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app:create_app_from_env",
+        "--port",
+        "8200",
+        "--factory"
+      ],
+      "cwd": "${workspaceFolder}/task4_rate_limit_fallback_router",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PRIMARY_URL": "http://127.0.0.1:9201",
+        "SECONDARY_URL": "http://127.0.0.1:9202",
+        "TENANT_KEYS": "sk-a:acme",
+        "TOKENS_PER_MINUTE": "2000",
+        "RATE_DB": "ratelimit.sqlite3"
+      }
+    },
+    {
+      "name": "Task 4: demo client",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/task4_rate_limit_fallback_router/demo_client.py",
+      "cwd": "${workspaceFolder}/task4_rate_limit_fallback_router",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "▶ Task 2 demo (mock + gateway + client)",
+      "stopAll": true,
+      "configurations": [
+        "Task 2: mock MCP server :9000",
+        "Task 2: gateway :8080",
+        "Task 2: demo client"
+      ]
+    },
+    {
+      "name": "▶ Task 3 demo (mock LLM + gateway + client)",
+      "stopAll": true,
+      "configurations": [
+        "Task 3: mock LLM :9100",
+        "Task 3: gateway :8100",
+        "Task 3: demo client"
+      ]
+    },
+    {
+      "name": "▶ Task 4 demo (2 providers + gateway + client)",
+      "stopAll": true,
+      "configurations": [
+        "Task 4: primary provider :9201 (slow)",
+        "Task 4: secondary provider :9202",
+        "Task 4: gateway :8200",
+        "Task 4: demo client"
+      ]
+    }
+  ]
+}
